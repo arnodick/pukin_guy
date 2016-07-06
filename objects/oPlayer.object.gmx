@@ -29,11 +29,17 @@
 colour = c_red;
 instance_create(0, 0, oMouth);
 
+face_x = x;
+face_y = y;
+face_size = 10;
+
+shake = -2.5;
+
 eye1_init_xposition = x - 4;
 eye1_init_yposition = y - 4;
 
-eye1_x = eye1_init_xposition;
-eye1_y = eye1_init_yposition;
+eye1_x = x - 4;
+eye1_y = y - 4;
 eye1_height = 1;
 eye1_width = 1.5;
 
@@ -42,7 +48,7 @@ eye2_x = x + 3;
 eye2_y = y - 3.5;
 
 eye2_init_height = 1.5;
-eye2_height = init_height;
+eye2_height = eye2_init_height;
 eye2_width = 3;
 </string>
           </argument>
@@ -67,6 +73,19 @@ eye2_width = 3;
           <argument>
             <kind>1</kind>
             <string>///Controls
+
+//Face
+    face_x = x;
+    face_y = y;
+
+//Eyes - Set eyes to their basic position on the head
+    eye1_x = x - 4 + cos( point_direction(x, y, gamepad_axis_value(0, gp_axislh), gamepad_axis_value(0, gp_axislv)) ) * face_size;
+    eye1_y = y - 4 + sin( point_direction(x, y, gamepad_axis_value(0, gp_axislh), gamepad_axis_value(0, gp_axislv)) ) * face_size;
+    
+    eye2_x = x + 3 + cos(gamepad_axis_value(0, gp_axislh)) * face_size;
+    eye2_y = y - 3.5 + sin(gamepad_axis_value(0, gp_axislv)) * face_size;
+    eye2_height = eye2_init_height;
+    
 if (global.gamepads[0] == true)
 {
     colour = c_blue;
@@ -79,14 +98,26 @@ if (global.gamepads[0] == true)
     {
         speed = 0;
     }
+    
     if ( (gamepad_axis_value(0, gp_axisrh) != 0) or (gamepad_axis_value(0, gp_axisrv) != 0) )
     {
+        //Face
+        face_x = face_x - (gamepad_axis_value(0, gp_axisrh))*3;
+        face_y = face_y - (gamepad_axis_value(0, gp_axisrv))*3;
+        shake = -shake;
+         //Eyes
+        eye1_x += random(4) - 2;
+        eye1_y += random(4) - 2;
+    
+        eye2_height = eye2_height / 8 + irandom(1);
+        
         instance_create(x + (gamepad_axis_value(0, gp_axisrh))*5, y + (gamepad_axis_value(0, gp_axisrv))*5, oPuke);
         if (!audio_is_playing(sndPuke))
         {
             audio_play_sound(sndPuke, 1, false);
         }
     }
+
 }
 
 if keyboard_check(vk_left)
@@ -104,53 +135,6 @@ if keyboard_check(vk_up)
 else if keyboard_check(vk_down)
 {
     y += 2;
-}
-
-
-
-if (!instance_exists(oEye1))
-{
-    instance_create(x, y, oEye1);
-}
-if (!instance_exists(oEye2))
-{
-    instance_create(x, y, oEye2);
-}
-</string>
-          </argument>
-        </arguments>
-      </action>
-      <action>
-        <libid>1</libid>
-        <id>603</id>
-        <kind>7</kind>
-        <userelative>0</userelative>
-        <isquestion>0</isquestion>
-        <useapplyto>-1</useapplyto>
-        <exetype>2</exetype>
-        <functionname></functionname>
-        <codestring></codestring>
-        <whoName>self</whoName>
-        <relative>0</relative>
-        <isnot>0</isnot>
-        <arguments>
-          <argument>
-            <kind>1</kind>
-            <string>///Eyes
-
-if ( (gamepad_axis_value(0, gp_axisrh) != 0) or (gamepad_axis_value(0, gp_axisrv) != 0) )
-{
-    eye1_x += random(4) - 2;
-    eye1_y += random(4) - 2;
-    
-    eye2_height = eye2_height / 2;
-}
-else
-{
-    eye1_x = init_xposition;
-    eye1_y = init_yposition;
-    
-    eye2_height = eye2_init_height;
 }
 </string>
           </argument>
@@ -176,36 +160,24 @@ else
             <kind>1</kind>
             <string>///Images
 surface_set_target(global.screen);
-    draw_set_colour(colour);
-    draw_circle(x, y, 10, false);
-surface_reset_target();
-</string>
-          </argument>
-        </arguments>
-      </action>
-      <action>
-        <libid>1</libid>
-        <id>603</id>
-        <kind>7</kind>
-        <userelative>0</userelative>
-        <isquestion>0</isquestion>
-        <useapplyto>-1</useapplyto>
-        <exetype>2</exetype>
-        <functionname></functionname>
-        <codestring></codestring>
-        <whoName>self</whoName>
-        <relative>0</relative>
-        <isnot>0</isnot>
-        <arguments>
-          <argument>
-            <kind>1</kind>
-            <string>///Eyes
-surface_set_target(global.screen);
-    draw_set_colour(c_yellow);
-    draw_rectangle(eye1_x - width, eye1_y - height, eye1_x + width, eye1_y + height, false);
-    draw_rectangle(eye2_x - width, eye2_y - height, eye2_x + width, eye2_y + height, false);
-surface_reset_target();
 
+    if (gamepad_axis_value(0, gp_axislv) &lt; 0)
+    {
+        draw_set_colour(colour);
+        draw_circle(face_x, face_y, face_size, false);
+    }
+    else
+    {
+        draw_set_colour(colour);
+        draw_circle(face_x, face_y, 10, false);
+        
+        //Eyes
+        draw_set_colour(c_yellow);
+        //draw_rectangle(eye1_x - eye1_width, eye1_y - eye1_height, eye1_x + eye1_width, eye1_y + eye1_height, false);
+        draw_rectangle(eye1_x - eye1_width, eye1_y - eye1_height, eye1_x + eye1_width, eye1_y + eye1_height, false);
+        draw_rectangle(eye2_x - eye2_width, eye2_y - eye2_height, eye2_x + eye2_width, eye2_y + eye2_height, false);
+    }
+surface_reset_target();
 </string>
           </argument>
         </arguments>

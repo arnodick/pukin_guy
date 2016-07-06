@@ -19,8 +19,6 @@
     <object>objects\oGame</object>
     <object>objects\oScreen</object>
     <object>objects\oPlayer</object>
-    <object>objects\oEye1</object>
-    <object>objects\oEye2</object>
     <object>objects\oMouth</object>
     <object>objects\oPuke</object>
   </objects>
@@ -28,7 +26,7 @@
     <room>rooms\rTitle</room>
   </rooms>
   <constants number="2">
-    <constant name="GM_build_date">41953.2734853009</constant>
+    <constant name="GM_build_date">41953.9661217245</constant>
     <constant name="GM_version">'1.0.0.0'</constant>
   </constants>
   <help>

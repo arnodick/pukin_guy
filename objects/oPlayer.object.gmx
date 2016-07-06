@@ -3,7 +3,7 @@
   <spriteName>&lt;undefined&gt;</spriteName>
   <solid>0</solid>
   <visible>-1</visible>
-  <depth>2</depth>
+  <depth>10</depth>
   <persistent>0</persistent>
   <parentName>&lt;undefined&gt;</parentName>
   <maskName>&lt;undefined&gt;</maskName>
@@ -27,7 +27,6 @@
             <kind>1</kind>
             <string>///Variables
 colour = c_red;
-instance_create(0, 0, oMouth);
 
 face_x = x;
 face_y = y;
@@ -37,23 +36,32 @@ shake = -2.5;
 
 length = 0;
 
-eye1_init_xposition = x - 4;
-eye1_init_yposition = y - 4;
+eye1_x_initposition = x - 4;
+eye1_y_initposition = y - 4;
 
-eye1_x = x - 4;
-eye1_y = y - 4;
+eye1_x = eye1_x_initposition;
+eye1_y = eye1_y_initposition;
 eye1_height = 1;
 eye1_width = 1.5;
-eye1_dir = -25;
+eye1_dir = -45;
 
+eye2_x_initposition = x + 3;
+eye2_y_initposition = y - 3.5;
 
-eye2_x = x + 3;
-eye2_y = y - 3.5;
+eye2_x = eye2_x_initposition;
+eye2_y = eye2_y_initposition;
 
 eye2_init_height = 1.5;
 eye2_height = eye2_init_height;
 eye2_width = 3;
-eye2_dir = 25;
+eye2_dir = -eye1_dir;
+
+mouth_x_initposition = x + 2;
+mouth_y_initposition = y + 4;
+
+mouth_x = mouth_x_initposition;
+mouth_y = mouth_y_initposition;
+mouth_size = 6;
 </string>
           </argument>
         </arguments>
@@ -83,12 +91,21 @@ eye2_dir = 25;
     face_y = y;
 
 //Eyes - Set eyes to their basic position on the head
-    eye1_x = x - 4;
-    eye1_y = y - 4;
+    eye1_x_initposition = x;
+    eye1_y_initposition = y - 6;
 
-    eye2_x = x + 3;
-    eye2_y = y - 3.5;
+    eye2_x_initposition = x;
+    eye2_y_initposition = y - 5.5;
+    
+    eye1_x = eye1_x_initposition;
+    eye1_y = eye1_y_initposition;
+        
     eye2_height = eye2_init_height;
+    
+//Mouth
+    mouth_x_initposition = x;
+    mouth_y_initposition = y;
+
     
 if (global.gamepads[0] == true)
 {
@@ -96,18 +113,26 @@ if (global.gamepads[0] == true)
     if ( (gamepad_axis_value(0, gp_axislh) != 0) or (gamepad_axis_value(0, gp_axislv) != 0) )
     {
         direction = point_direction(0, 0, gamepad_axis_value(0, gp_axislh), gamepad_axis_value(0, gp_axislv));
-        length = point_distance(0, 0, gamepad_axis_value(0, gp_axislh)*face_size/2, gamepad_axis_value(0, gp_axislv)*face_size/2);
-        speed = 4;
-        eye1_x += lengthdir_x(length, direction + eye1_dir);
-        eye1_y += lengthdir_y(length, direction + eye1_dir);
+        length = point_distance(0, 0, gamepad_axis_value(0, gp_axislh)*6, gamepad_axis_value(0, gp_axislv)*6);
         
-        eye2_x += lengthdir_x(length, direction + eye2_dir);
-        eye2_y += lengthdir_y(length, direction + eye2_dir);
+        speed = 4;
     }
     else
     {
+        direction = point_direction(0, 0, 0, 1);
+        length = 6;
+    
         speed = 0;
     }
+    
+    eye1_x = eye1_x_initposition + lengthdir_x(length, direction + eye1_dir);
+    eye1_y = eye1_y_initposition + lengthdir_y(length, direction + eye1_dir);
+    
+    eye2_x = eye2_x_initposition + lengthdir_x(length, direction + eye2_dir);
+    eye2_y = eye2_y_initposition + lengthdir_y(length, direction + eye2_dir);
+    
+    mouth_x = mouth_x_initposition + lengthdir_x(length, direction);
+    mouth_y = mouth_y_initposition + lengthdir_y(length, direction);
     
     if ( (gamepad_axis_value(0, gp_axisrh) != 0) or (gamepad_axis_value(0, gp_axisrv) != 0) )
     {
@@ -120,14 +145,16 @@ if (global.gamepads[0] == true)
         eye1_y += random(4) - 2;
     
         eye2_height = eye2_height / 8 + irandom(1);
+
+        mouth_x = mouth_x_initposition + (gamepad_axis_value(0, gp_axisrh))*3;
+        mouth_y = mouth_y_initposition + (gamepad_axis_value(0, gp_axisrv))*3;
         
-        instance_create(x + (gamepad_axis_value(0, gp_axisrh))*5, y + (gamepad_axis_value(0, gp_axisrv))*5, oPuke);
+        instance_create(mouth_x + (gamepad_axis_value(0, gp_axisrh))*5, mouth_y + (gamepad_axis_value(0, gp_axisrv))*5, oPuke);
         if (!audio_is_playing(sndPuke))
         {
             audio_play_sound(sndPuke, 1, false);
         }
     }
-
 }
 
 if keyboard_check(vk_left)
@@ -170,8 +197,28 @@ else if keyboard_check(vk_down)
             <kind>1</kind>
             <string>///Images
 surface_set_target(global.screen);
+    
     if (gamepad_axis_value(0, gp_axislv) &lt; 0)
     {
+        //Eyes
+        draw_set_colour(c_yellow);
+        //draw_rectangle(eye1_x - eye1_width, eye1_y - eye1_height, eye1_x + eye1_width, eye1_y + eye1_height, false);
+        draw_rectangle(eye1_x - eye1_width, eye1_y - eye1_height, eye1_x + eye1_width, eye1_y + eye1_height, false);
+        draw_rectangle(eye2_x - eye2_width, eye2_y - eye2_height, eye2_x + eye2_width, eye2_y + eye2_height, false);
+        
+        if ( (gamepad_axis_value(0, gp_axisrh) != 0) or (gamepad_axis_value(0, gp_axisrv) != 0) )
+        {
+            draw_set_colour(c_blue);
+            draw_ellipse(mouth_x - mouth_size, mouth_y - mouth_size /2, mouth_x + mouth_size, mouth_y + mouth_size, false);
+            draw_set_colour(c_red);
+            draw_triangle(mouth_x - mouth_size, mouth_y + mouth_size/2, mouth_x + mouth_size, mouth_y + mouth_size/2, x, mouth_y - mouth_size/3, false);
+        }
+        else
+        {
+            draw_set_colour(c_red);
+            draw_ellipse(mouth_x - mouth_size, mouth_y - mouth_size/2, mouth_x + mouth_size, mouth_y + mouth_size/2, false);
+        }
+        
         draw_set_colour(colour);
         draw_circle(face_x, face_y, face_size, false);
     }
@@ -185,8 +232,25 @@ surface_set_target(global.screen);
         //draw_rectangle(eye1_x - eye1_width, eye1_y - eye1_height, eye1_x + eye1_width, eye1_y + eye1_height, false);
         draw_rectangle(eye1_x - eye1_width, eye1_y - eye1_height, eye1_x + eye1_width, eye1_y + eye1_height, false);
         draw_rectangle(eye2_x - eye2_width, eye2_y - eye2_height, eye2_x + eye2_width, eye2_y + eye2_height, false);
+        
+        if ( (gamepad_axis_value(0, gp_axisrh) != 0) or (gamepad_axis_value(0, gp_axisrv) != 0) )
+        {
+            draw_set_colour(c_blue);
+            draw_ellipse(mouth_x - mouth_size, mouth_y - mouth_size /2, mouth_x + mouth_size, mouth_y + mouth_size, false);
+            draw_set_colour(c_red);
+            draw_triangle(mouth_x - mouth_size, mouth_y + mouth_size/2, mouth_x + mouth_size, mouth_y + mouth_size/2, x, mouth_y - mouth_size/3, false);
+        }
+        else
+        {
+            draw_set_colour(c_red);
+            draw_ellipse(mouth_x - mouth_size, mouth_y - mouth_size/2, mouth_x + mouth_size, mouth_y + mouth_size/2, false);
+        }
     }
 surface_reset_target();
+
+
+
+
 </string>
           </argument>
         </arguments>

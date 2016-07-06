@@ -34,7 +34,17 @@ outline_colour = make_colour_hsv(64, 255, 60);
 
 size = irandom(4) + 2;
 speed = 6 + (irandom(4) - 2);
+vspeed -= 5;
 
+if (gamepad_axis_value(0, gp_axislv) &lt; 0)
+{
+    depth = 20;
+}
+else
+{
+    depth = 0;
+}
+    
 deviationRange = 30;
 deviation = ( irandom(deviationRange) - deviationRange/2);
 
@@ -62,6 +72,7 @@ direction = deviation + point_direction(0, 0, gamepad_axis_value(0, gp_axisrh), 
           <argument>
             <kind>1</kind>
             <string>///Movement
+
 vspeed += 0.5;
 </string>
           </argument>

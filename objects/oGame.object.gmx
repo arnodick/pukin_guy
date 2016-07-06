@@ -27,7 +27,7 @@
             <kind>1</kind>
             <string>///Instances
 instance_create(0, 0, oScreen);
-instance_create(0, 0, oPlayer);
+instance_create(room_width/2, room_height/2, oPlayer);
 </string>
           </argument>
         </arguments>

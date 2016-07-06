@@ -35,6 +35,8 @@ face_size = 10;
 
 shake = -2.5;
 
+length = 0;
+
 eye1_init_xposition = x - 4;
 eye1_init_yposition = y - 4;
 
@@ -42,6 +44,7 @@ eye1_x = x - 4;
 eye1_y = y - 4;
 eye1_height = 1;
 eye1_width = 1.5;
+eye1_dir = -25;
 
 
 eye2_x = x + 3;
@@ -50,6 +53,7 @@ eye2_y = y - 3.5;
 eye2_init_height = 1.5;
 eye2_height = eye2_init_height;
 eye2_width = 3;
+eye2_dir = 25;
 </string>
           </argument>
         </arguments>
@@ -79,11 +83,11 @@ eye2_width = 3;
     face_y = y;
 
 //Eyes - Set eyes to their basic position on the head
-    eye1_x = x - 4 + cos( point_direction(x, y, gamepad_axis_value(0, gp_axislh), gamepad_axis_value(0, gp_axislv)) ) * face_size;
-    eye1_y = y - 4 + sin( point_direction(x, y, gamepad_axis_value(0, gp_axislh), gamepad_axis_value(0, gp_axislv)) ) * face_size;
-    
-    eye2_x = x + 3 + cos(gamepad_axis_value(0, gp_axislh)) * face_size;
-    eye2_y = y - 3.5 + sin(gamepad_axis_value(0, gp_axislv)) * face_size;
+    eye1_x = x - 4;
+    eye1_y = y - 4;
+
+    eye2_x = x + 3;
+    eye2_y = y - 3.5;
     eye2_height = eye2_init_height;
     
 if (global.gamepads[0] == true)
@@ -92,7 +96,13 @@ if (global.gamepads[0] == true)
     if ( (gamepad_axis_value(0, gp_axislh) != 0) or (gamepad_axis_value(0, gp_axislv) != 0) )
     {
         direction = point_direction(0, 0, gamepad_axis_value(0, gp_axislh), gamepad_axis_value(0, gp_axislv));
+        length = point_distance(0, 0, gamepad_axis_value(0, gp_axislh)*face_size/2, gamepad_axis_value(0, gp_axislv)*face_size/2);
         speed = 4;
+        eye1_x += lengthdir_x(length, direction + eye1_dir);
+        eye1_y += lengthdir_y(length, direction + eye1_dir);
+        
+        eye2_x += lengthdir_x(length, direction + eye2_dir);
+        eye2_y += lengthdir_y(length, direction + eye2_dir);
     }
     else
     {
@@ -160,7 +170,6 @@ else if keyboard_check(vk_down)
             <kind>1</kind>
             <string>///Images
 surface_set_target(global.screen);
-
     if (gamepad_axis_value(0, gp_axislv) &lt; 0)
     {
         draw_set_colour(colour);
